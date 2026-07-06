@@ -59,17 +59,37 @@ Today's Schedule for Jordan (2026-07-06):
 
 ```bash
 # Run the full test suite:
-pytest
+python -m pytest
 
 # Run with coverage:
 pytest --cov
 ```
 
+### What the Tests Cover
+
+The current test suite verifies the following core functionality of the PawPal+ system:
+
+- `mark_complete()` correctly updates a task's completion status.
+- Adding a task to a pet increases the pet's task count.
+- `sort_by_time()` orders tasks chronologically by their scheduled time.
+- Completing a daily recurring task automatically creates the next day's occurrence.
+- `detect_conflicts()` identifies overlapping scheduled tasks and reports scheduling conflicts.
+
 Sample test output:
 
 ```
-# Paste your pytest output here
+tests/test_pawpal.py::test_mark_complete_changes_status PASSED              [ 20%]
+tests/test_pawpal.py::test_adding_task_increases_pet_task_count PASSED      [ 40%]
+tests/test_pawpal.py::test_sort_by_time_orders_tasks_chronologically PASSED [ 60%]
+tests/test_pawpal.py::test_mark_complete_on_daily_task_creates_next_day_occurrence PASSED [ 80%]
+tests/test_pawpal.py::test_detect_conflicts_flags_tasks_at_duplicate_times PASSED [100%]
 ```
+
+### Confidence Level
+
+⭐⭐⭐⭐☆ (4/5)
+
+All five automated tests passed successfully, indicating that the core task management, scheduling, recurring task generation, and conflict detection features are working as expected. Additional edge-case and integration tests (such as invalid inputs, empty task lists, and priority tie cases) would increase confidence in the overall reliability of the system.
 
 ## 📐 Smarter Scheduling
 
