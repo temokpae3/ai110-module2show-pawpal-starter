@@ -48,10 +48,11 @@ Paste a sample of your app's CLI or Streamlit output here so a reader can see wh
 
 ```
 # e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
+Today's Schedule for Jordan (2026-07-06):
+--------------------------------------------------
+08:00  Biscuit    Morning walk         [high, 30 min, pending]
+08:30  Mochi      Feed breakfast       [high, 10 min, pending]
+18:00  Biscuit    Evening meds         [medium, 5 min, pending]
 ```
 
 ## 🧪 Testing PawPal+

@@ -20,6 +20,8 @@ Scheduler: Book, Update, and Delete plans, give priorities to tasks
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
 
+Yes. One change was adding bidirectional relationships by giving Customer a plans list and Pets a tasks list so objects can be navigated from either side, making it easier to look up a customer's plans and a pet's required tasks while keeping the model consistent with the UML design.
+
 ---
 
 ## 2. Scheduling Logic and Tradeoffs
