@@ -5,7 +5,15 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+Ans: The system allows a user to enter information about themselves and their pets, schedule tasks for their pets, and display that plan.
 - What classes did you include, and what responsibilities did you assign to each?
+Ans:
+Diagram: Pet Business
+Classes: Customer, Pets, Tasks, Plan
+Methods: Customer - Add, update, and delete tasks; add, update, and delete user information; be assigned to their pets
+Pets - Add, Update, and delete records; Special Instructions
+Tasks - Walks, Feeding, Meds, Enrichment, Grooming
+Scheduler: Book, Update, and Delete plans, give priorities to tasks
 
 **b. Design changes**
 

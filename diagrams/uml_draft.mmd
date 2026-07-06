@@ -1,0 +1,57 @@
+classDiagram
+    class Customer {
+        -customerId: string
+        -name: string
+        -email: string
+        -phone: string
+        -pets: Pets[]
+        +addTask(task: Tasks) void
+        +updateTask(task: Tasks) void
+        +deleteTask(taskId: string) void
+        +addUserInfo(info: object) void
+        +updateUserInfo(info: object) void
+        +deleteUserInfo(field: string) void
+        +assignPet(pet: Pets) void
+    }
+
+    class Pets {
+        -petId: string
+        -name: string
+        -species: string
+        -breed: string
+        -specialInstructions: string
+        -owner: Customer
+        +addRecord(record: object) void
+        +updateRecord(record: object) void
+        +deleteRecord(recordId: string) void
+        +setSpecialInstructions(text: string) void
+    }
+
+    class Tasks {
+        -taskId: string
+        -type: string
+        -durationMinutes: int
+        -priority: string
+        -pet: Pets
+        +walk() void
+        +feed() void
+        +meds() void
+        +enrichment() void
+        +grooming() void
+    }
+
+    class Plan {
+        -planId: string
+        -date: Date
+        -customer: Customer
+        -scheduledTasks: Tasks[]
+        +bookPlan() void
+        +updatePlan(planId: string) void
+        +deletePlan(planId: string) void
+        +prioritizeTasks() void
+    }
+
+    Customer "1" --> "many" Pets : owns
+    Pets "1" --> "many" Tasks : requires
+    Customer "1" --> "many" Plan : schedules
+    Plan "1" --> "many" Tasks : includes
