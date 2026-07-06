@@ -29,12 +29,16 @@ Yes. One change was adding bidirectional relationships by giving Customer a plan
 **a. Constraints and priorities**
 
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
+Priority, duration, time-of-day, completion status, recurrence and time-overlapping conflicts.
 - How did you decide which constraints mattered most?
+I prioritized constraints that directly affect the feasibility and usefulness of a schedule. Time conflicts and completion status were treated as the highest priority to prevent invalid schedules, while priority, duration, time of day, and recurrence were used to optimize the ordering of tasks.
 
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+One tradeoff is The scheduler using Python's built-in sorting (sort()/sorted()) to order tasks by priority and scheduled time instead of implementing a more specialized algorithm.
 - Why is that tradeoff reasonable for this scenario?
+Because Pawpal only manages a small number of pet-care tasks, so the simpler, more readable approach provides sufficient performance while being easier to maintain.
 
 ---
 

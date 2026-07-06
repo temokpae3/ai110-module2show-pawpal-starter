@@ -73,14 +73,12 @@ Sample test output:
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `Plan.prioritize_tasks()`, `Plan.sort_by_time()` | `prioritize_tasks()` sorts by priority (high first), then duration as a tie-breaker within the same priority. `sort_by_time()` sorts the same list chronologically by `scheduled_time` instead, so the plan can be viewed either by importance or by time of day. |
+| Filtering | `Plan.filter_tasks(is_completed=None, pet_name=None)` | Narrows `scheduled_tasks` by completion status and/or pet name. Both filters are optional and independent — pass one, both (ANDed together), or neither. |
+| Conflict handling | `Plan.detect_conflicts()` | Compares every pair of scheduled tasks by `[scheduled_date + scheduled_time, +duration_minutes)` window and flags any that overlap — regardless of whether it's the same pet or two different pets, since one owner can't be in two places at once. Returns a list of warning strings instead of raising, so a scheduling clash never crashes the app. `book_plan()` runs it automatically and stores the result in `Plan.conflicts`. |
+| Recurring tasks | `Tasks.mark_complete()` → `Tasks.spawn_next_occurrence()` | Completing a `"daily"` or `"weekly"` task automatically creates and attaches the next occurrence, with `scheduled_date` advanced by a `timedelta` (1 day or 1 week). `"once"` tasks don't recur. |
 
 ## 📸 Demo Walkthrough
 
