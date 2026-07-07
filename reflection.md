@@ -47,12 +47,16 @@ Because Pawpal only manages a small number of pet-care tasks, so the simpler, mo
 **a. How you used AI**
 
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
+I used AI to brainstorm class design, refactor code for readability, and generate ideas for unit tests.
 - What kinds of prompts or questions were most helpful?
+The most helpful prompts were the ones where I asked first how it could be planned out so I could review it and then go for the implementation that had explanations for it.
 
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
+I did not accept every testing suggestion because some proposed tests covered functionality I had not implemented.
 - How did you evaluate or verify what the AI suggested?
+I verified each suggestion by comparing it with my code and only included tests that matched the actual behavior of the system.
 
 ---
 
@@ -61,12 +65,16 @@ Because Pawpal only manages a small number of pet-care tasks, so the simpler, mo
 **a. What you tested**
 
 - What behaviors did you test?
+I tested task completion, adding tasks to pets, chronological task sorting, recurring daily task creation, and scheduling conflict detection.
 - Why were these tests important?
+Because they verified the core functionality of the scheduler.
 
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
+I'm fairly confident (4/5) that the scheduler works correctly because all five unit tests passed successfully.
 - What edge cases would you test next if you had more time?
+With more time, I would test additional edge cases such as invalid priorities, empty task lists, back-to-back tasks, and recurring tasks marked complete multiple times.
 
 ---
 
@@ -75,11 +83,14 @@ Because Pawpal only manages a small number of pet-care tasks, so the simpler, mo
 **a. What went well**
 
 - What part of this project are you most satisfied with?
+I'm most satisfied with how the classes work together to manage pets, tasks, and scheduling in a clear and organized way.
 
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
+If I had another iteration, I would increase test coverage, improve error handling, and add more scheduling features such as automatic optimization.
 
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+One important thing I learned is that AI is most useful as a development assistant for planning out UML Diagrams for better implementation of a system.

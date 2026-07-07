@@ -12,6 +12,16 @@ A busy pet owner needs help staying consistent with pet care. They want an assis
 
 Your job is to design the system first (UML), then implement the logic in Python, then connect it to the Streamlit UI.
 
+## ✨ Features
+
+- **Priority-based scheduling** — `Plan.prioritize_tasks()` orders tasks high → medium → low, using duration as a tie-breaker within the same priority tier.
+- **Chronological sorting** — `Plan.sort_by_time()` re-orders the same task list by `scheduled_time`, so a plan can be viewed by importance or by time of day.
+- **Conflict warnings** — `Plan.detect_conflicts()` checks every pair of scheduled tasks for overlapping time windows (`scheduled_date` + `scheduled_time` + `duration_minutes`) and returns human-readable warnings instead of raising. Catches both same-pet and cross-pet clashes, since one owner can't be in two places at once.
+- **Daily/weekly recurrence** — completing a recurring task (`Tasks.mark_complete()`) automatically spawns the next occurrence via `Tasks.spawn_next_occurrence()`, advancing `scheduled_date` by a day or a week. `"once"` tasks don't recur.
+- **Status & pet filtering** — `Plan.filter_tasks(is_completed=None, pet_name=None)` narrows the schedule by completion status and/or pet, independently or combined.
+- **Automatic plan booking** — `Plan.book_plan()` ties it together: pulls every pet's tasks via `Customer.get_all_tasks()`, drops completed ones, prioritizes what's left, and runs conflict detection in one call.
+- **Interactive UI** — the Streamlit app (`app.py`) lets an owner add pets/tasks, generate a schedule, toggle between priority and time ordering, filter by status/pet, and see conflict warnings live.
+
 ## What you will build
 
 Your final app should:
@@ -102,12 +112,101 @@ All five automated tests passed successfully, indicating that the core task mana
 
 ## 📸 Demo Walkthrough
 
-Describe your app in numbered steps so a reader can follow along without watching a video:
+### Main UI features
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+The Streamlit app (`app.py`) is organized into four sections, each backed directly by the
+`pawpal_system` classes:
+
+- **Add a Pet** — enter a name, species, breed, and optional special instructions; submitted
+  pets are added via `Customer.add_pet()` and listed in a table with their live task count.
+- **Schedule a Task** — pick a pet, category, frequency, description, time, duration, and
+  priority; submitting calls `Customer.add_task(pet_id, task)`, which attaches the task to that
+  pet. All tasks across every pet are shown in a running table below the form.
+- **Build Schedule** — generates a `Plan` for today via `Plan.book_plan()`, which gathers every
+  pet's tasks, drops completed ones, and prioritizes what's left.
+- **Sort & filter controls** — once a schedule exists, a radio toggle switches between priority
+  order and `Plan.sort_by_time()`'s chronological order, and two dropdowns narrow the table by
+  completion status and/or pet via `Plan.filter_tasks()`.
+
+### Example workflow
+
+1. **Add a pet** — e.g. "Mochi" (cat) and "Biscuit" (dog).
+2. **Schedule a task** for each pet — e.g. a "Morning walk" for Biscuit at 08:00 and "Feed
+   breakfast" for Mochi at 08:30.
+3. **Click "Generate schedule"** to build today's plan.
+4. **View today's schedule** — the table shows both tasks in priority order, with a success or
+   warning banner depending on whether `detect_conflicts()` found any overlaps.
+5. **Toggle "Sort by: Time"** to see the same tasks re-ordered chronologically instead, or use
+   the Status/Pet filters to narrow the table down (e.g. just Mochi's pending tasks).
+
+### Key Scheduler behaviors shown
+
+- **Priority-based scheduling** — high-priority tasks surface first, with shorter tasks breaking
+  ties within the same priority tier.
+- **Chronological sorting** — the same task list re-ordered by time of day on demand.
+- **Conflict warnings** — overlapping tasks (same pet or different pets) are flagged with a
+  human-readable warning instead of silently double-booking the owner.
+- **Filtering** — narrowing the plan by completion status, pet, or both at once.
+- **Daily recurrence** — completing a `"daily"`/`"weekly"` task automatically schedules its next
+  occurrence one interval later.
+
+### Sample CLI output
+
+`main.py` demonstrates the same behaviors end-to-end outside the UI — building an owner with two
+pets, six deliberately out-of-order and overlapping tasks, then booking and inspecting a plan:
+
+```
+Today's Schedule for Jordan (2026-07-06) - priority order:
+--------------------------------------------------
+08:30  Mochi      Feed breakfast       [high, 10 min, pending]
+08:00  Biscuit    Morning walk         [high, 30 min, pending]
+18:00  Biscuit    Evening meds         [medium, 5 min, pending]
+08:10  Biscuit    Ear cleaning         [low, 10 min, pending]
+12:00  Mochi      Midday playtime      [low, 15 min, pending]
+08:00  Mochi      Nail trim            [low, 15 min, pending]
+
+Conflict check (detect_conflicts, run automatically by book_plan):
+--------------------------------------------------
+WARNING: Conflict: 'Morning walk' (Biscuit, 08:00) overlaps with 'Ear cleaning' (Biscuit, 08:10)
+WARNING: Conflict: 'Morning walk' (Biscuit, 08:00) overlaps with 'Nail trim' (Mochi, 08:00)
+WARNING: Conflict: 'Ear cleaning' (Biscuit, 08:10) overlaps with 'Nail trim' (Mochi, 08:00)
+
+Sorted by time (sort_by_time):
+--------------------------------------------------
+08:00  Mochi      Nail trim            [low, 15 min, pending]
+08:00  Biscuit    Morning walk         [high, 30 min, pending]
+08:10  Biscuit    Ear cleaning         [low, 10 min, pending]
+08:30  Mochi      Feed breakfast       [high, 10 min, done]
+08:30  Mochi      Feed breakfast       [high, 10 min, pending]
+12:00  Mochi      Midday playtime      [low, 15 min, pending]
+18:00  Biscuit    Evening meds         [medium, 5 min, pending]
+
+Filtered: pending tasks only (filter_tasks(is_completed=False)):
+--------------------------------------------------
+08:00  Mochi      Nail trim            [low, 15 min, pending]
+08:00  Biscuit    Morning walk         [high, 30 min, pending]
+08:10  Biscuit    Ear cleaning         [low, 10 min, pending]
+08:30  Mochi      Feed breakfast       [high, 10 min, pending]
+12:00  Mochi      Midday playtime      [low, 15 min, pending]
+18:00  Biscuit    Evening meds         [medium, 5 min, pending]
+
+Filtered: Mochi's tasks only (filter_tasks(pet_name='Mochi')):
+--------------------------------------------------
+08:00  Mochi      Nail trim            [low, 15 min, pending]
+08:30  Mochi      Feed breakfast       [high, 10 min, done]
+08:30  Mochi      Feed breakfast       [high, 10 min, pending]
+12:00  Mochi      Midday playtime      [low, 15 min, pending]
+
+Filtered: Mochi's pending tasks (filter_tasks(is_completed=False, pet_name='Mochi')):
+--------------------------------------------------
+08:00  Mochi      Nail trim            [low, 15 min, pending]
+08:30  Mochi      Feed breakfast       [high, 10 min, pending]
+12:00  Mochi      Midday playtime      [low, 15 min, pending]
+```
+
+Note the two "Feed breakfast" rows in the last three sections: `main.py` marks the first task in
+the list complete before re-running `sort_by_time()`/`filter_tasks()`, which triggers
+`spawn_next_occurrence()` and adds tomorrow's pending copy alongside the original completed one —
+a live demonstration of daily recurrence.
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->

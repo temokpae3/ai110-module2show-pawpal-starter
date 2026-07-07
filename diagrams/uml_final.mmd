@@ -1,0 +1,75 @@
+classDiagram
+    class Customer {
+        -customerId: string
+        -name: string
+        -email: string
+        -phone: string
+        -pets: Pets[]
+        -plans: Plan[]
+        -extraInfo: Map~string, string~
+        +addPet(pet: Pets) void
+        +getPet(petId: string) Pets
+        +addTask(petId: string, task: Tasks) void
+        +updateTask(petId: string, taskId: string, updates: object) Tasks
+        +deleteTask(petId: string, taskId: string) void
+        +getAllTasks() Tasks[]
+        +addUserInfo(field: string, value: string) void
+        +updateUserInfo(field: string, value: string) void
+        +deleteUserInfo(field: string) void
+    }
+
+    class Pets {
+        -petId: string
+        -name: string
+        -species: string
+        -breed: string
+        -specialInstructions: string
+        -owner: Customer
+        -tasks: Tasks[]
+        +addTask(task: Tasks) void
+        +updateTask(taskId: string, updates: object) Tasks
+        +removeTask(taskId: string) void
+        +getTasks() Tasks[]
+        +setSpecialInstructions(text: string) void
+    }
+
+    class Tasks {
+        -taskId: string
+        -description: string
+        -category: string
+        -scheduledTime: Time
+        -frequency: string
+        -durationMinutes: int
+        -priority: string
+        -isCompleted: bool
+        -pet: Pets
+        -scheduledDate: Date
+        +markComplete() void
+        +markIncomplete() void
+        +spawnNextOccurrence() Tasks
+    }
+
+    class Plan {
+        -planId: string
+        -date: Date
+        -customer: Customer
+        -scheduledTasks: Tasks[]
+        -conflicts: string[]
+        +gatherTasks() Tasks[]
+        +prioritizeTasks() void
+        +sortByTime() Tasks[]
+        +filterTasks(isCompleted: bool, petName: string) Tasks[]
+        +detectConflicts() string[]
+        +bookPlan() void
+        +updatePlan() void
+        +deletePlan() void
+    }
+
+    Customer "1" --> "many" Pets : owns
+    Pets "1" --> "many" Tasks : requires
+    Customer "1" --> "many" Plan : schedules
+    Plan "1" o--> "many" Tasks : references (pulled via Customer.getAllTasks())
+    Tasks ..> Tasks : spawnNextOccurrence() creates next recurrence
+
+    note for Tasks "markComplete() also calls\nspawnNextOccurrence(), which creates\nand attaches the next daily/weekly\ninstance to the same pet."
+    note for Plan "bookPlan() orchestrates the others:\ngatherTasks() -> prioritizeTasks() ->\ndetectConflicts(). sortByTime() and\nfilterTasks() are called separately\nfor display/reporting."

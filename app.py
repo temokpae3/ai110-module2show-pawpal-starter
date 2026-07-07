@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import date, time
 
 import streamlit as st
 from pawpal_system import Customer, Pets, Tasks, Plan
@@ -151,18 +151,54 @@ else:
 st.divider()
 
 st.subheader("Build Schedule")
-st.caption("This button should call your scheduling logic once you implement it.")
+st.caption(
+    "Builds today's plan with Plan.book_plan() (prioritizes tasks and runs conflict detection)."
+)
 
 if st.button("Generate schedule"):
-    st.warning(
-        "Not implemented yet. Next step: create your scheduling logic (classes/functions) and call it here."
-    )
-    st.markdown(
-        """
-Suggested approach:
-1. Design your UML (draft).
-2. Create class stubs (no logic).
-3. Implement scheduling behavior.
-4. Connect your scheduler here and display results.
-"""
-    )
+    plan = Plan(plan_id=f"plan{len(customer.plans) + 1}", plan_date=date.today(), customer=customer)
+    plan.book_plan()
+    st.session_state.plan = plan
+
+if "plan" not in st.session_state:
+    st.info("Click 'Generate schedule' to build today's plan.")
+else:
+    plan = st.session_state.plan
+
+    if plan.conflicts:
+        for warning in plan.conflicts:
+            st.warning(warning)
+    else:
+        st.success("No scheduling conflicts detected.")
+
+    sort_order = st.radio("Sort by", ["Priority", "Time"], horizontal=True)
+    display_tasks = plan.sort_by_time() if sort_order == "Time" else plan.scheduled_tasks
+
+    col1, col2 = st.columns(2)
+    with col1:
+        status_filter = st.selectbox("Status", ["All", "Pending", "Completed"])
+    with col2:
+        pet_filter = st.selectbox("Pet", ["All"] + [p.name for p in customer.pets])
+
+    is_completed = {"Pending": False, "Completed": True}.get(status_filter)
+    pet_name = None if pet_filter == "All" else pet_filter
+
+    plan.scheduled_tasks = display_tasks
+    filtered_tasks = plan.filter_tasks(is_completed=is_completed, pet_name=pet_name)
+
+    if filtered_tasks:
+        st.table(
+            [
+                {
+                    "time": t.scheduled_time.strftime("%H:%M"),
+                    "pet": t.pet.name if t.pet else "Unknown pet",
+                    "task": t.description,
+                    "priority": t.priority,
+                    "duration_minutes": t.duration_minutes,
+                    "status": "done" if t.is_completed else "pending",
+                }
+                for t in filtered_tasks
+            ]
+        )
+    else:
+        st.info("No tasks match the selected filters.")
